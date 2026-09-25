@@ -1,11 +1,5 @@
 # DRG neuron immunofluorescence quantification
 
-Per-cell intensity quantification for cultured human dorsal root ganglion
-neurons imaged in three fluorescence channels. Cell bodies are located on a
-pan-neuronal FITC stain, then Cy5 and Texas Red intensities are measured within
-those regions. Neurites are segmented separately and measured as their own
-compartment.
-
 ## Install
 
 ```bash
