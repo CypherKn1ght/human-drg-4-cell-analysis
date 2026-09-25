@@ -50,38 +50,31 @@ and when soma pixels sit at the sensor ceiling.
 
 ## How it works
 
-**Soma segmentation** — seeded region growing, not a single threshold. An Otsu
-threshold finds bright cell cores, used only as seeds; touching cores are split
-by a distance-transform watershed. Each seed then grows outward into a more
-permissive Li threshold, so the dim side of a soma is captured while isolated
-dim debris, having no seed, is not. A morphological opening bounds the growth
-region, so masks stop at the soma edge instead of running down an axon. Objects
-touching the frame edge, outside the accepted size range, or below the
-convexity floor are discarded.
+**Soma segmentation** 
+An Otsu threshold picks out bright cell cores. These are used as seeds only. Touching seeds are separated with a distance-transform watershed.
 
-**Neurite segmentation** — a Sato tubeness filter, which scores each pixel on
-how much it resembles an elongated tube rather than a blob or noise. A
-threshold alone cannot isolate processes, since any cutoff low enough to catch
-faint neurites also catches background fluctuation. Somas are dilated and
-subtracted from the result.
+Each seed then expands into a second, lower threshold (Li), which picks up the dimmer parts of a soma. Dim debris with no seed inside it stays excluded.
 
-Neurites are measured as one field-level compartment, not assigned to
-individual cells. Processes from different neurons cross and overlap, so
-per-cell attribution is not recoverable from a single 2D field, and merging
-them into cell masks would dilute soma signal in proportion to how much neurite
-surrounded each cell.
+The expansion is confined to a region that has been morphologically opened, which removes thin structures. Masks therefore stop at the soma edge and do not follow axons.
 
-**Measurement** — background is estimated per image and per channel from
-regions well away from any segmented structure, then subtracted. Each mask is
-eroded a few pixels so blurry edge pixels do not contribute. Mean intensity is
-reported rather than integrated density, since soma diameter varies widely and
-integrated density would scale with cell size.
+Masks are dropped if they touch the frame edge, fall outside the size range, or fall below the solidity cutoff.
 
-**Correlations** — computed within each plate, not across the pooled set.
-Plates commonly sit at different intensity offsets, and pooling raw values
-across them can obscure a relationship present in every plate individually. A
-pooled figure is also reported, computed on within-plate z-scores so the
-offsets cancel.
+**Neurite segmentation** 
+A Sato tubeness filter scores each pixel on how tube-like it is. Thresholding on brightness alone does not work here, because the cutoff needed to catch faint neurites also catches background. Somas are dilated and subtracted, leaving the processes.
+
+Neurites are pooled into one measurement per field. They are not assigned to individual cells, because processes cross and overlap and there is no way to tell which neuron a segment belongs to in a single 2D image. Adding them to cell masks would also pull each cell's mean toward the dimmer neurite value.
+
+**Measurement**
+Background is measured per image and per channel from pixels far from any mask, then subtracted.
+
+Masks are eroded a few pixels before measuring, so blurred edge pixels are excluded.
+
+The script reports mean intensity. Integrated density scales with cell size, and DRG soma diameter varies too much for that to be useful.
+
+**Correlations** 
+Correlations are calculated separately for each plate. Plates often differ in overall intensity, and combining them can hide a relationship that holds within every plate.
+
+A combined value is also reported. It uses z-scores computed within each plate, which removes the offsets.
 
 ## Caveats
 
