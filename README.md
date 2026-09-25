@@ -50,7 +50,7 @@ and when soma pixels sit at the sensor ceiling.
 
 ## How it works
 
-**Soma segmentation** 
+###**Soma segmentation** 
 An Otsu threshold picks out bright cell cores. These are used as seeds only. Touching seeds are separated with a distance-transform watershed.
 
 Each seed then expands into a second, lower threshold (Li), which picks up the dimmer parts of a soma. Dim debris with no seed inside it stays excluded.
@@ -59,19 +59,19 @@ The expansion is confined to a region that has been morphologically opened, whic
 
 Masks are dropped if they touch the frame edge, fall outside the size range, or fall below the solidity cutoff.
 
-**Neurite segmentation** 
+###**Neurite segmentation** 
 A Sato tubeness filter scores each pixel on how tube-like it is. Thresholding on brightness alone does not work here, because the cutoff needed to catch faint neurites also catches background. Somas are dilated and subtracted, leaving the processes.
 
 Neurites are pooled into one measurement per field. They are not assigned to individual cells, because processes cross and overlap and there is no way to tell which neuron a segment belongs to in a single 2D image. Adding them to cell masks would also pull each cell's mean toward the dimmer neurite value.
 
-**Measurement**
+###**Measurement**
 Background is measured per image and per channel from pixels far from any mask, then subtracted.
 
 Masks are eroded a few pixels before measuring, so blurred edge pixels are excluded.
 
 The script reports mean intensity. Integrated density scales with cell size, and DRG soma diameter varies too much for that to be useful.
 
-**Correlations** 
+###**Correlations** 
 Correlations are calculated separately for each plate. Plates often differ in overall intensity, and combining them can hide a relationship that holds within every plate.
 
 A combined value is also reported. It uses z-scores computed within each plate, which removes the offsets.
